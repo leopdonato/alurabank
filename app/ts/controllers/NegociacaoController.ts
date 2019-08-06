@@ -27,7 +27,7 @@ export class NegociacaoController {
 
         let data = new Date(this._inputData.val().replace(/-/g, ','));
 
-        if(!this._isDiaUtil(data)) {
+        if (!this._isDiaUtil(data)) {
 
             this._mensagemView.update('Somente negociações em dias úteis, por favor');
             return
@@ -46,13 +46,14 @@ export class NegociacaoController {
         this._mensagemView.update('Negociação adicionada com sucesso!');
     }
 
-    private _isDiaUtil (data: Date){
+    private _isDiaUtil(data: Date) {
 
         return data.getDay() != DiaDaSemana.Sabado && data.getDay() != DiaDaSemana.Domingo;
     }
 
     @throttle()
     importaDados() {
+        /*
         function isOk(res: Response) {
 
             if(res.ok) {
@@ -61,22 +62,26 @@ export class NegociacaoController {
                 throw new Error(res.statusText);
             }
         }
+        */
 
         this._negociacaoService
-            .obterNegociacoes(isOk)
+            .obterNegociacoes(res => {
+                if (res.ok) return res;
+                throw new Error(res.statusText);
+            })
             .then(negociacoes => {
-                negociacoes.forEach(negociacao => 
+                negociacoes.forEach(negociacao =>
                     this._negociacoes.adiciona(negociacao));
                 this._negociacoesView.update(this._negociacoes);
             })
             .catch((err: Error) => {
                 this._mensagemView.update('Não foi possível importar os dados.');
                 console.log(err.message);
-            });   
+            });
     }
 }
 
-enum DiaDaSemana{
+enum DiaDaSemana {
     Domingo,
     Segunda,
     Terca,
