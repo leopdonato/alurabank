@@ -85,8 +85,7 @@ export class NegociacaoController {
                 this._negociacoesView.update(this._negociacoes);
             })
             .catch((err: Error) => {
-                this._mensagemView.update('Não foi possível importar os dados.');
-                console.log(err.message);
+                this._mensagemView.update(err.message);
             });
     }
 }

@@ -65,8 +65,7 @@ System.register(["../models/index", "../views/index", "../helpers/decorators/ind
                         this._negociacoesView.update(this._negociacoes);
                     })
                         .catch((err) => {
-                        this._mensagemView.update('Não foi possível importar os dados.');
-                        console.log(err.message);
+                        this._mensagemView.update(err.message);
                     });
                 }
             };
