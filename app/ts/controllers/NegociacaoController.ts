@@ -72,8 +72,15 @@ export class NegociacaoController {
                 if (res.ok) return res;
                 throw new Error(res.statusText);
             })
-            .then(negociacoes => {
-                negociacoes.forEach(negociacao =>
+            .then(negociacoesParaImportar => {
+
+                const negociacoesJaImportadas = this._negociacoes.paraArray();
+
+                negociacoesParaImportar
+                    .filter(negociacao => 
+                        !negociacoesJaImportadas.some(jaImportadas => 
+                            negociacao.isIgual(jaImportadas)))
+                    .forEach(negociacao =>
                     this._negociacoes.adiciona(negociacao));
                 this._negociacoesView.update(this._negociacoes);
             })
