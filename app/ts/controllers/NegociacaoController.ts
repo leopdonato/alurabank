@@ -55,7 +55,7 @@ export class NegociacaoController {
     }
 
     @throttle()
-    importaDados() {
+    async importaDados() {
         /*
         function isOk(res: Response) {
 
@@ -66,27 +66,43 @@ export class NegociacaoController {
             }
         }
         */
+        try {
+            const negociacoesParaImportar = await this._negociacaoService
+                .obterNegociacoes(res => {
+                    if (res.ok) return res;
+                    throw new Error(res.statusText);
+                });
 
-        this._negociacaoService
-            .obterNegociacoes(res => {
-                if (res.ok) return res;
-                throw new Error(res.statusText);
-            })
-            .then(negociacoesParaImportar => {
-
-                const negociacoesJaImportadas = this._negociacoes.paraArray();
-
-                negociacoesParaImportar
-                    .filter(negociacao => 
-                        !negociacoesJaImportadas.some(jaImportadas => 
-                            negociacao.isIgual(jaImportadas)))
-                    .forEach(negociacao =>
+            const negociacoesJaImportadas = this._negociacoes.paraArray();
+            negociacoesParaImportar
+                .filter(negociacao =>
+                    !negociacoesJaImportadas.some(jaImportadas =>
+                        negociacao.isIgual(jaImportadas)))
+                .forEach(negociacao =>
                     this._negociacoes.adiciona(negociacao));
-                this._negociacoesView.update(this._negociacoes);
-            })
-            .catch((err: Error) => {
-                this._mensagemView.update(err.message);
-            });
+            this._negociacoesView.update(this._negociacoes);
+
+        } catch (err) {
+            this._mensagemView.update(err.message);
+        }
+
+        /*
+        .then(negociacoesParaImportar => {
+
+            const negociacoesJaImportadas = this._negociacoes.paraArray();
+
+            negociacoesParaImportar
+                .filter(negociacao => 
+                    !negociacoesJaImportadas.some(jaImportadas => 
+                        negociacao.isIgual(jaImportadas)))
+                .forEach(negociacao =>
+                this._negociacoes.adiciona(negociacao));
+            this._negociacoesView.update(this._negociacoes);
+        })
+        .catch((err: Error) => {
+            this._mensagemView.update(err.message);
+        });
+        */
     }
 }
 
